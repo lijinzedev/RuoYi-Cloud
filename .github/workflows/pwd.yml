@@ -8,7 +8,6 @@ jobs:
   test: 
     runs-on: ubuntu-latest
     steps:
-      - name: 拉取代码
-        uses: actions/checkout@v2
-      - run: |
-          pwd
+      -  uses: actions/checkout@v2
+      -  run: |
+          npm install
