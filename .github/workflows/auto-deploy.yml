@@ -22,7 +22,7 @@ jobs:
     - name: Login to registry
       run: docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
     - name: Push Image
-      run: docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
+      run: docker push ruoyi-ui:latest
   pull-docker:
     needs: [build]
     name: Pull Docker
