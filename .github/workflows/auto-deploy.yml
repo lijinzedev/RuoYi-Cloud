@@ -14,8 +14,8 @@ jobs:
         node-version: 8
     - name: npm install, build, and test
       run: |
-        npm install ./ruoyi-ui
-        npm run build:prod ./ruoyi-ui
+        npm install --prefix ./ruoyi-ui
+        npm run --prefix ./ruoyi-ui build:prod 
     - name: Build Image
 
       run: docker build -f ./ruoyi-ui/Dockerfile -t ruoyi-ui:latest
