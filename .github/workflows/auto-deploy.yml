@@ -1,0 +1,44 @@
+name: Vue-Test-CI
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 8
+      uses: actions/setup-node@v1
+      with:
+        node-version: 8
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build:prod
+    - name: Build Image
+
+      run: docker build -f ./ruoyi-ui/Dockerfile -t ruoyi-ui:latest
+    - name: Login to registry
+      run: docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
+    - name: Push Image
+      run: docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
+  pull-docker:
+    needs: [build]
+    name: Pull Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          port: ${{ secrets.HOST_PORT }}
+          script: |
+            docker stop $(docker ps --filter ancestor=ruoyi-ui -q)
+            docker rm -f $(docker ps -a --filter ancestor=ruoyi-ui:latest -q)
+            docker rmi -f $(docker images ruoyi-ui:latest -q)
+            docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
+            docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
+            docker run -d -p 8000:80 ruoyi-ui:latest
