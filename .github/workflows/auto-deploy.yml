@@ -12,16 +12,16 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 8
-    - name: npm install, build, and test
+    - name: 打包前端
       run: |
         npm install --prefix ./ruoyi-ui
         npm run --prefix ./ruoyi-ui build:prod 
-    - name: Build Image
+    - name: 构建镜像
 
       run: docker build -f ./ruoyi-ui/Dockerfile -t ruoyi-ui:latest ./ruoyi-ui
-    - name: Login to registry
+    - name: 登录到阿里云镜像
       run: docker login --username=${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
-    - name: Push Image
+    - name: 推送镜像
       run: docker push ruoyi-ui:latest
   pull-docker:
     needs: [build]
